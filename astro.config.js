@@ -1,5 +1,4 @@
 // npm
-import solid from '@astrojs/solid-js'
 import tailwind from '@astrojs/tailwind'
 
 // astro
@@ -10,8 +9,5 @@ export default defineConfig({
   integrations: [
     tailwind(),
     devtoolBreakpoints(),
-    solid({
-      include: ['**/solid/*'],
-    }),
   ],
 })
