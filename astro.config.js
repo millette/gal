@@ -6,6 +6,7 @@ import { defineConfig } from 'astro/config'
 import devtoolBreakpoints from "astro-devtool-breakpoints"
 
 export default defineConfig({
+  base: process.cwd() + "/dist",
   integrations: [
     tailwind(),
     devtoolBreakpoints(),
