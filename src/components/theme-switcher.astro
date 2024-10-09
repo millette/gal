@@ -1,0 +1,23 @@
+---
+const themes = {
+  light: "🌞",
+  dark: "🌚",
+}
+
+if (Astro.props.reversed) {
+  themes.light = "🌚"
+  themes.dark = "🌞"
+}
+---
+<div class="absolute right-2">
+  <label class="swap swap-flip text-4xl">
+    <input type="checkbox" id="theme-controller" class="hidden theme-controller" value={Astro.props.theme || "dark"}>
+    <span class="swap-off fill-current">{themes.light}</span>
+    <span class="swap-on fill-current">{themes.dark}</span>
+  </label>
+</div>
+<script is:inline>
+  const el = document.getElementById("theme-controller")
+  if (localStorage.getItem("theme")) el.click()
+  el.addEventListener("change", () => localStorage.setItem("theme", el.checked ? "checked" : ""))
+</script>
