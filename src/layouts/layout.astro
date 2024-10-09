@@ -1,8 +1,6 @@
 ---
 // self
-import ThemeSwitcher from "!components/theme-switcher.astro"
 import Breakpoints from "!components/breakpoints.astro"
-import { darkTheme } from "!root/consts.js"
 ---
 <html lang="fr" class="overflow-y-scroll">
 	<head>
@@ -20,7 +18,6 @@ import { darkTheme } from "!root/consts.js"
 	</head>
 	<body>
 		<Breakpoints />
-		<ThemeSwitcher theme={darkTheme} />
 		<div class="container my-4">
 			<h1 class="text-4xl font-bold">{Astro.props.title}</h1>
       <slot />
