@@ -3,17 +3,17 @@
 import Breakpoints from "!components/breakpoints.astro"
 ---
 <html lang="fr" class="overflow-y-scroll">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{Astro.props.title}</title>
-	</head>
-	<body  class="bg-black">
-		<Breakpoints />
-		<div class="container my-4">
-		
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{Astro.props.title}</title>
+    </head>
+    <body  class="bg-black">
+        <Breakpoints />
+        <div class="container my-4">
+        
       <slot />
     </div>
-	</body>
+    </body>
 </html>
