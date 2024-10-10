@@ -9,7 +9,7 @@ import { title } from "!root/consts.js"
 // mettre les images dans src/assets/images/gallery/
 // pnpm build && pnpm preview && google-chrome dist/index.html
 // attention, les html utilisent un chemin absolu vers le répertoire ./dist/ actuel.
-
+// Load images from gallery
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/gallery/*.{jpeg,jpg,png,gif}')
 const imageKeys = Object.keys(images)
 const lastImageIndex = imageKeys.length
@@ -55,16 +55,27 @@ const heightImage = heightSlider - 50
       clearInterval(intervalId);
     }
 
+    // Function to toggle the carousel state
+    function toggleCarousel() {
+      if (isCarouselRunning) {
+        stopCarousel();
+      } else {
+        startCarousel();
+      }
+      isCarouselRunning = !isCarouselRunning; // Toggle the running state
+    }
+
     // Toggle the carousel on image click
     document.querySelectorAll('.clickable').forEach((image) => {
-      image.addEventListener('click', () => {
-        if (isCarouselRunning) {
-          stopCarousel();
-        } else {
-          startCarousel();
-        }
-        isCarouselRunning = !isCarouselRunning; // Toggle the running state
-      });
+      image.addEventListener('click', toggleCarousel); // Directly call toggleCarousel
+    });
+
+    // Handle spacebar press to toggle carousel
+    document.addEventListener('keydown', (event) => {
+      if (event.code === 'Space') {
+        event.preventDefault(); // Prevent the default spacebar behavior (scrolling)
+        toggleCarousel(); // Call toggleCarousel on spacebar press
+      }
     });
 
     // Start the carousel initially
