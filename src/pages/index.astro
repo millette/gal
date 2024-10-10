@@ -2,7 +2,6 @@
 // astro
 import type { ImageMetadata } from 'astro'
 import { Image } from 'astro:assets'
-
 // self
 import Layout from "!layouts/layout.astro"
 import { title } from "!root/consts.js"
@@ -14,36 +13,61 @@ import { title } from "!root/consts.js"
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/gallery/*.{jpeg,jpg,png,gif}')
 const imageKeys = Object.keys(images)
 const lastImageIndex = imageKeys.length
-const heightSlider = 700
+const heightSlider = 1080
 const heightImage = heightSlider - 50
-
 ---
+
 <Layout title={title}>
-	<div>
-		<div class="flex w-full justify-center gap-2 py-2">
-			{imageKeys.map((_x, i) => (
-			<a href={`#slide${i + 1}`} class="btn btn-xs">{i + 1}</a>
-			))}
-		</div>
-		<div class={`carousel w-full`}>
-			{imageKeys.map((x, i) => (
-			<div id={`slide${i + 1}`} class={`w-full max-h-[80vh]	carousel-item relative`}>
-				<Image
-					height={heightImage}
-					src={images[x]()}
-					alt={`Image #${i + 1}`}
-					class="object-scale-down w-full" />
-				<div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-					<a href={`#slide${(i % lastImageIndex) || lastImageIndex}`} class="btn btn-circle">❮</a>
-					<a href={`#slide${(i + 2) > lastImageIndex ? 1 : (i + 2)}`} class="btn btn-circle">❯</a>
-				</div>
-			</div>
-			))}
-		</div>
-		<div class="flex w-full justify-center gap-2 py-2">
-			{imageKeys.map((_x, i) => (
-			<a href={`#slide${i + 1}`} class="btn btn-xs">{i + 1}</a>
-			))}
-		</div>
-	</div>
+  <div class={`carousel w-full`}>
+    {imageKeys.map((x, i) => (
+      <div id={`slide${i + 1}`} class={`w-full max-h-[100vh] carousel-item relative`}>
+        <Image
+          height={heightImage}
+          src={images[x]()}
+          alt={`Image #${i + 1}`}
+          class="object-scale-down w-full clickable" />
+      </div>
+    ))}
+  </div>
+
+  <script type="module" define:vars={{ imageKeys }}>
+    const slideInterval = 5000;
+    let currentSlide = 0;
+    let isCarouselRunning = true; // Track whether the carousel is running
+    let intervalId;
+
+    // Function to change slides
+    function changeSlide() {
+      currentSlide = (currentSlide + 1) % imageKeys.length;
+      const nextSlide = document.querySelector(`#slide${currentSlide + 1}`);
+      if (nextSlide) {
+        nextSlide.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Function to start the carousel
+    function startCarousel() {
+      intervalId = setInterval(changeSlide, slideInterval);
+    }
+
+    // Function to stop the carousel
+    function stopCarousel() {
+      clearInterval(intervalId);
+    }
+
+    // Toggle the carousel on image click
+    document.querySelectorAll('.clickable').forEach((image) => {
+      image.addEventListener('click', () => {
+        if (isCarouselRunning) {
+          stopCarousel();
+        } else {
+          startCarousel();
+        }
+        isCarouselRunning = !isCarouselRunning; // Toggle the running state
+      });
+    });
+
+    // Start the carousel initially
+    startCarousel();
+  </script>
 </Layout>

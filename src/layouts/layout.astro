@@ -9,10 +9,10 @@ import Breakpoints from "!components/breakpoints.astro"
 		<meta name="generator" content={Astro.generator} />
 		<title>{Astro.props.title}</title>
 	</head>
-	<body>
+	<body  class="bg-black">
 		<Breakpoints />
 		<div class="container my-4">
-			<h1 class="text-4xl font-bold">{Astro.props.title}</h1>
+		
       <slot />
     </div>
 	</body>
