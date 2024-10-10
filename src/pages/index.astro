@@ -37,98 +37,121 @@ const heightImage = heightSlider
 ---
 
 <Layout title={title}>
-	<!-- Carousel Container -->
-	<div class="carousel relative w-full h-full">
-	  {imageKeys.map((x, i) => (
-		<div id={`slide${i + 1}`} class={`carousel-item absolute inset-0 opacity-0 transition-opacity duration-1000 ${i === 0 ? 'active' : ''}`} style="z-index: 1;">
-		  <Image
-			height={heightImage}
-			src={images[x]()}
-			alt={`Image #${i + 1}`}
-			class="object-scale-down w-full clickable" />
-		</div>
-	  ))}
-	</div>
+    <!-- Carousel Container -->
+    <div class="carousel relative w-full h-full">
+      {imageKeys.map((x, i) => (
+        <div id={`slide${i + 1}`} class={`carousel-item absolute inset-0 opacity-0 transition-opacity duration-1000 ${i === 0 ? 'active' : ''}`} style="z-index: 1;">
+          <Image
+            height={heightImage}
+            src={images[x]()}
+            alt={`Image #${i + 1}`}
+            class="object-scale-down w-full clickable" />
+        </div>
+      ))}
+    </div>
+    <button id="prevButton" class="hidden absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2">❮</button>
+    <button id="nextButton" class="hidden absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2">❯</button>
   
-	<!-- CSS to control fade-in/out transitions -->
-	<style>
-	  .carousel {
-		position: relative;
-		height: 100vh;
-	  }
+    <!-- CSS to control fade-in/out transitions -->
+    <style>
+      .carousel {
+        position: relative;
+        height: 100vh;
+      }
   
-	  .carousel-item {
-		opacity: 0;
-		transition: opacity 1s ease-in-out;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100vh;
-	  }
+      .carousel-item {
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+      }
   
-	  .active {
-		opacity: 1;
-	  }
+      .active {
+        opacity: 1;
+      }
 
-	  img { height: 100vh}
-	</style>
+      .hidden {
+        display: none;
+      }
+
+      img { height: 100vh}
+    </style>
   
-	<script type="module" define:vars={{ imageKeys }}>
-	  const slideInterval = 2000;
-	  let currentSlide = 0;
-	  let isCarouselRunning = true;
-	  let intervalId;
+    <script type="module" define:vars={{ imageKeys }}>
+      const slideInterval = 2000;
+      let currentSlide = 0;
+      let isCarouselRunning = true;
+      let intervalId;
   
-	  const slides = document.querySelectorAll('.carousel-item');
+      const slides = document.querySelectorAll('.carousel-item');
+      const prevButton = document.getElementById('prevButton');
+      const nextButton = document.getElementById('nextButton');
   
-	  // Function to change slides with fade transition
-	  function changeSlide() {
-		// Remove 'active' class from the current slide
-		slides[currentSlide].classList.remove('active');
+      // Function to change slides with fade transition
+      function changeSlide(direction = 1) {
+        // Remove 'active' class from the current slide
+        slides[currentSlide].classList.remove('active');
   
-		// Move to the next slide
-		currentSlide = (currentSlide + 1) % slides.length;
+        // Move to the next slide
+        currentSlide = (currentSlide + direction + slides.length) % slides.length;
   
-		// Add 'active' class to the new slide
-		slides[currentSlide].classList.add('active');
-	  }
+        // Add 'active' class to the new slide
+        slides[currentSlide].classList.add('active');
+      }
   
-	  // Function to start the carousel
-	  function startCarousel() {
-		intervalId = setInterval(changeSlide, slideInterval);
-	  }
+      // Function to start the carousel
+      function startCarousel() {
+        intervalId = setInterval(() => changeSlide(1), slideInterval);
+        prevButton.classList.add('hidden'); // Hide buttons when running
+        nextButton.classList.add('hidden');
+      }
   
-	  // Function to stop the carousel
-	  function stopCarousel() {
-		clearInterval(intervalId);
-	  }
+      // Function to stop the carousel
+      function stopCarousel() {
+        clearInterval(intervalId);
+        prevButton.classList.remove('hidden'); // Show buttons when stopped
+        nextButton.classList.remove('hidden');
+      }
   
-	  // Function to toggle the carousel state
-	  function toggleCarousel() {
-		if (isCarouselRunning) {
-		  stopCarousel();
-		} else {
-		  startCarousel();
-		}
-		isCarouselRunning = !isCarouselRunning;
-	  }
+      // Function to toggle the carousel state
+      function toggleCarousel() {
+        if (isCarouselRunning) {
+          stopCarousel();
+        } else {
+          startCarousel();
+        }
+        isCarouselRunning = !isCarouselRunning;
+      }
   
-	  // Toggle the carousel on image click
-	  document.querySelectorAll('.clickable').forEach((image) => {
-		image.addEventListener('click', toggleCarousel);
-	  });
+      // Toggle the carousel on image click
+      document.querySelectorAll('.clickable').forEach((image) => {
+        image.addEventListener('click', toggleCarousel);
+      });
   
-	  // Handle spacebar press to toggle carousel
-	  document.addEventListener('keydown', (event) => {
-		if (event.code === 'Space') {
-		  event.preventDefault();
-		  toggleCarousel();
-		}
-	  });
+      // Handle spacebar press to toggle carousel
+      document.addEventListener('keydown', (event) => {
+        if (event.code === 'Space') {
+          event.preventDefault();
+          toggleCarousel();
+        }
+      });
+
+      // Handle Prev/Next buttons click
+      prevButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent bubbling to parent click event
+        changeSlide(-1); // Move to the previous slide
+      });
+
+      nextButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent bubbling to parent click event
+        changeSlide(1); // Move to the next slide
+      });
   
-	  // Start the carousel initially
-	  slides[currentSlide].classList.add('active'); // Set the first image as active
-	  startCarousel();
-	</script>
+      // Start the carousel initially
+      slides[currentSlide].classList.add('active'); // Set the first image as active
+      startCarousel();
+    </script>
   </Layout>
