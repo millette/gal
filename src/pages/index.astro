@@ -11,9 +11,26 @@ import { title } from "!root/consts.js"
 // pnpm build && pnpm preview && google-chrome dist/index.html
 // attention, les html utilisent un chemin absolu vers le répertoire ./dist/ actuel.
 
+// Set random flag: TRUE for random, FALSE for original order
+const random = true;
+
 // Load images from gallery
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/gallery/*.{jpeg,jpg,png,gif}')
-const imageKeys = Object.keys(images)
+let imageKeys = Object.keys(images) // Change from const to let
+
+// Shuffle the images for random order if random is true
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+if (random) {
+  imageKeys = shuffleArray(imageKeys); // Shuffle only if random is TRUE
+}
+
 const lastImageIndex = imageKeys.length
 const heightSlider = 1080
 const heightImage = heightSlider
