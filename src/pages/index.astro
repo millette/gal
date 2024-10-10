@@ -2,6 +2,7 @@
 // astro
 import type { ImageMetadata } from 'astro'
 import { Image } from 'astro:assets'
+
 // self
 import Layout from "!layouts/layout.astro"
 import { title } from "!root/consts.js"
@@ -9,76 +10,108 @@ import { title } from "!root/consts.js"
 // mettre les images dans src/assets/images/gallery/
 // pnpm build && pnpm preview && google-chrome dist/index.html
 // attention, les html utilisent un chemin absolu vers le répertoire ./dist/ actuel.
+
 // Load images from gallery
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/gallery/*.{jpeg,jpg,png,gif}')
 const imageKeys = Object.keys(images)
 const lastImageIndex = imageKeys.length
 const heightSlider = 1080
-const heightImage = heightSlider - 50
+const heightImage = heightSlider
 ---
 
 <Layout title={title}>
-  <div class={`carousel w-full`}>
-    {imageKeys.map((x, i) => (
-      <div id={`slide${i + 1}`} class={`w-full max-h-[100vh] carousel-item relative`}>
-        <Image
-          height={heightImage}
-          src={images[x]()}
-          alt={`Image #${i + 1}`}
-          class="object-scale-down w-full clickable" />
-      </div>
-    ))}
-  </div>
+	<!-- Carousel Container -->
+	<div class="carousel relative w-full h-full">
+	  {imageKeys.map((x, i) => (
+		<div id={`slide${i + 1}`} class={`carousel-item absolute inset-0 opacity-0 transition-opacity duration-1000 ${i === 0 ? 'active' : ''}`} style="z-index: 1;">
+		  <Image
+			height={heightImage}
+			src={images[x]()}
+			alt={`Image #${i + 1}`}
+			class="object-scale-down w-full clickable" />
+		</div>
+	  ))}
+	</div>
+  
+	<!-- CSS to control fade-in/out transitions -->
+	<style>
+	  .carousel {
+		position: relative;
+		height: 100vh;
+	  }
+  
+	  .carousel-item {
+		opacity: 0;
+		transition: opacity 1s ease-in-out;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100vh;
+	  }
+  
+	  .active {
+		opacity: 1;
+	  }
 
-  <script type="module" define:vars={{ imageKeys }}>
-    const slideInterval = 5000;
-    let currentSlide = 0;
-    let isCarouselRunning = true; // Track whether the carousel is running
-    let intervalId;
-
-    // Function to change slides
-    function changeSlide() {
-      currentSlide = (currentSlide + 1) % imageKeys.length;
-      const nextSlide = document.querySelector(`#slide${currentSlide + 1}`);
-      if (nextSlide) {
-        nextSlide.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    // Function to start the carousel
-    function startCarousel() {
-      intervalId = setInterval(changeSlide, slideInterval);
-    }
-
-    // Function to stop the carousel
-    function stopCarousel() {
-      clearInterval(intervalId);
-    }
-
-    // Function to toggle the carousel state
-    function toggleCarousel() {
-      if (isCarouselRunning) {
-        stopCarousel();
-      } else {
-        startCarousel();
-      }
-      isCarouselRunning = !isCarouselRunning; // Toggle the running state
-    }
-
-    // Toggle the carousel on image click
-    document.querySelectorAll('.clickable').forEach((image) => {
-      image.addEventListener('click', toggleCarousel); // Directly call toggleCarousel
-    });
-
-    // Handle spacebar press to toggle carousel
-    document.addEventListener('keydown', (event) => {
-      if (event.code === 'Space') {
-        event.preventDefault(); // Prevent the default spacebar behavior (scrolling)
-        toggleCarousel(); // Call toggleCarousel on spacebar press
-      }
-    });
-
-    // Start the carousel initially
-    startCarousel();
-  </script>
-</Layout>
+	  img { height: 100vh}
+	</style>
+  
+	<script type="module" define:vars={{ imageKeys }}>
+	  const slideInterval = 2000;
+	  let currentSlide = 0;
+	  let isCarouselRunning = true;
+	  let intervalId;
+  
+	  const slides = document.querySelectorAll('.carousel-item');
+  
+	  // Function to change slides with fade transition
+	  function changeSlide() {
+		// Remove 'active' class from the current slide
+		slides[currentSlide].classList.remove('active');
+  
+		// Move to the next slide
+		currentSlide = (currentSlide + 1) % slides.length;
+  
+		// Add 'active' class to the new slide
+		slides[currentSlide].classList.add('active');
+	  }
+  
+	  // Function to start the carousel
+	  function startCarousel() {
+		intervalId = setInterval(changeSlide, slideInterval);
+	  }
+  
+	  // Function to stop the carousel
+	  function stopCarousel() {
+		clearInterval(intervalId);
+	  }
+  
+	  // Function to toggle the carousel state
+	  function toggleCarousel() {
+		if (isCarouselRunning) {
+		  stopCarousel();
+		} else {
+		  startCarousel();
+		}
+		isCarouselRunning = !isCarouselRunning;
+	  }
+  
+	  // Toggle the carousel on image click
+	  document.querySelectorAll('.clickable').forEach((image) => {
+		image.addEventListener('click', toggleCarousel);
+	  });
+  
+	  // Handle spacebar press to toggle carousel
+	  document.addEventListener('keydown', (event) => {
+		if (event.code === 'Space') {
+		  event.preventDefault();
+		  toggleCarousel();
+		}
+	  });
+  
+	  // Start the carousel initially
+	  slides[currentSlide].classList.add('active'); // Set the first image as active
+	  startCarousel();
+	</script>
+  </Layout>
